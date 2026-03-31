@@ -31,9 +31,10 @@
     .consent input { margin-top: 2px; width: auto; flex-shrink: 0; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     #timer { text-align: center; font-size: 1.1rem; font-weight: bold; color: #e8490f; margin-top: 8px; display: none; }
-    #status { margin-top: 14px; text-align: center; font-size: 0.9rem; color: #444; }
+    #progressBar { display:none; margin-top:10px; width:100%; height:8px; border-radius:4px; background:#eee; overflow:hidden; }
+    #progressFill { height:100%; width:0%; background:#2e7d32; transition:width 0.2s; border-radius:4px; }
+    #status { margin-top: 10px; text-align: center; font-size: 0.9rem; color: #444; }
     #success { display: none; text-align: center; padding: 20px 0; }
-    #success h2 { color: #2e7d32; margin-bottom: 8px; }
   </style>
 </head>
 <body>
@@ -76,6 +77,7 @@
 
     <button id="submitBtn" class="btn btn-primary" style="display:none">Submit Testimonial</button>
     <button id="backBtn" class="btn btn-secondary" style="display:none">← Back</button>
+    <div id="progressBar"><div id="progressFill"></div></div>
     <div id="status"></div>
     <p style="margin-top:14px;font-size:0.85rem;color:#555;"><em>Don't worry about editing or perfection — we'll handle that. Just speak naturally!</em></p>
     <span class="tip-link" onclick="document.getElementById('tipBox').style.display = document.getElementById('tipBox').style.display === 'block' ? 'none' : 'block'">Need help? Click for tips on what to say :)</span>
@@ -299,6 +301,7 @@
 
     submitBtn.disabled = true;
     rerecordBtn.disabled = true;
+    document.getElementById("backBtn").disabled = true;
     statusEl.textContent = "Uploading...";
 
     try {
@@ -311,10 +314,24 @@
       });
       const { url } = await res.json();
 
-      await fetch(url, {
-        method: "PUT",
-        headers: { "Content-Type": mimeType },
-        body: recordedBlob,
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const progressBar = document.getElementById("progressBar");
+        const progressFill = document.getElementById("progressFill");
+        progressBar.style.display = "block";
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100);
+            progressFill.style.width = pct + "%";
+            statusEl.textContent = `Uploading... ${pct}%`;
+          }
+        };
+        xhr.onload = () => xhr.status === 200 ? resolve() : reject(new Error("Upload failed"));
+        xhr.onerror = () => reject(new Error("Upload failed"));
+        xhr.open("PUT", url);
+        xhr.setRequestHeader("Content-Type", mimeType);
+        xhr.send(recordedBlob);
       });
 
       document.getElementById("form-section").style.display = "none";
@@ -322,8 +339,10 @@
       if (stream) stream.getTracks().forEach(t => t.stop());
     } catch (err) {
       statusEl.textContent = "Upload failed. Please try again.";
+      document.getElementById("progressBar").style.display = "none";
       submitBtn.disabled = false;
       rerecordBtn.disabled = false;
+      document.getElementById("backBtn").disabled = false;
     }
   };
 </script>
