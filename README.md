@@ -1,6 +1,6 @@
 # Video Testimonial App
 
-A serverless web app that lets anyone record and submit a video testimonial for the **AWS Solutions Architect Associate course by Chetan Agrawal** on Udemy. No server required — fully hosted on AWS using S3, CloudFront, API Gateway, and Lambda.
+A serverless web app that lets anyone record and submit a video testimonial. Testimonial video is stored in your S3 bucket. No server required — fully hosted on AWS using S3, CloudFront, API Gateway, and Lambda.
 
 ## Architecture
 
