@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Share Your Testimonial</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f5f5f5; display: flex; justify-content: center; padding: 24px 16px; }
+    .card { background: #fff; border-radius: 12px; padding: 28px 24px; max-width: 480px; width: 100%; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+    h1 { font-size: 1.4rem; margin-bottom: 6px; }
+    p.sub { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; margin-top: 14px; }
+    input { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 0.95rem; }
+    video { width: 100%; border-radius: 8px; background: #000; margin-top: 16px; max-height: 280px; display: none; }
+    .btn { display: inline-block; margin-top: 14px; padding: 10px 20px; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; width: auto; font-weight: 600; }
+    .btn-primary { background: #e8490f; color: #fff; }
+    .btn-secondary { background: #eee; color: #333; }
+    .btn-green { background: #2e7d32; color: #fff; }
+    .btn-rerecord { background: #6a1b9a; color: #fff; }
+    .btn-blue { background: #1565c0; color: #fff; }
+    .btn-red { background: #c62828; color: #fff; }
+    .tip-link { display: inline-block; margin-top: 12px; font-size: 0.85rem; color: #1565c0; cursor: pointer; text-decoration: underline; }
+    .tip-box { display: none; background: #f0f4ff; border-left: 4px solid #1565c0; border-radius: 6px; padding: 14px 16px; margin-top: 10px; font-size: 0.85rem; color: #333; line-height: 1.6; }
+    .tip-box ul { margin: 8px 0 0 16px; }
+    .consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 16px; font-size: 0.85rem; color: #444; }
+    .consent input { margin-top: 2px; width: auto; flex-shrink: 0; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    #timer { text-align: center; font-size: 1.1rem; font-weight: bold; color: #e8490f; margin-top: 8px; display: none; }
+    #status { margin-top: 14px; text-align: center; font-size: 0.9rem; color: #444; }
+    #success { display: none; text-align: center; padding: 20px 0; }
+    #success h2 { color: #2e7d32; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div id="form-section">
+    <h1>Share your Testimonial for AWS course by Chetan Agrawal</h1>
+    <p class="sub">Record a short video (max 1 min) about your learning experience and outcome.</p>
+
+    <label for="name">Your Name *</label>
+    <input id="name" type="text" placeholder="Jane Doe" required />
+
+    <label for="email">Email (optional)</label>
+    <input id="email" type="email" placeholder="jane@example.com" />
+
+    <div class="consent">
+      <input type="checkbox" id="consent" checked />
+      <label for="consent" style="margin:0;font-weight:normal;">I provide my consent to use this testimonial for promotional activities.</label>
+    </div>
+
+    <video id="preview" autoplay playsinline></video>
+    <div id="timer">⏱ <span id="time">0:00</span> / 1:00</div>
+
+    <button id="previewBtn" class="btn btn-green">Enable Camera and Microphone</button>
+    <button id="startBtn" class="btn btn-blue" style="display:none">Start Recording</button>
+    <button id="stopBtn" class="btn btn-red" style="display:none">Stop Recording</button>
+    <button id="rerecordBtn" class="btn btn-rerecord" style="display:none">Re-record</button>
+    <button id="submitBtn" class="btn btn-primary" style="display:none">Submit Testimonial</button>
+    <p style="margin-top:10px;"><em>Don't worry about editing or perfection — we'll handle that. Just speak naturally!</em></p>
+    <span class="tip-link" onclick="document.getElementById('tipBox').style.display = document.getElementById('tipBox').style.display === 'block' ? 'none' : 'block'">Need help? Click for tips on what to say :)</span>
+    <div class="tip-box" id="tipBox">
+      <strong>Here's a simple script to get you started:</strong>
+      <ul>
+        <li>"Hi, I'm [your name] and I recently completed Chetan Agrawal's [name of the course]."</li>
+        <li>"Before this course, I [struggled with / had no experience in] cloud computing."</li>
+        <li>"What I loved most was [specific topic, teaching style, hands-on labs, etc.]."</li>
+        <li>"After completing this course, I [passed the exam / got a job / feel confident with AWS]."</li>
+        <li>"I'd highly recommend this course to anyone who wants to learn AWS and get AWS certified."</li>
+      </ul>
+    </div>
+
+    <div id="status"></div>
+  </div>
+
+  <div id="success">
+    <h2>Thank you! 🎉</h2>
+    <p>Your testimonial has been submitted successfully.</p>
+  </div>
+</div>
+
+<script>
+  const API_URL = "https://r0xu3ezgs2.execute-api.ap-south-1.amazonaws.com/prod/presign";
+
+  // iOS Chrome doesn't support MediaRecorder — must use Safari on iOS
+  const isIOSChrome = /iphone|ipad|ipod/i.test(navigator.userAgent) && /CriOS/i.test(navigator.userAgent);
+  if (isIOSChrome) {
+    document.getElementById("form-section").innerHTML =
+      `<h1>Unsupported Browser</h1>
+       <p style="margin-top:12px;color:#555;">Video recording is not supported in Chrome on iPhone.<br><br>
+       Please open this page in <strong>Safari</strong> instead.</p>`;
+  }
+
+  const preview = document.getElementById("preview");
+  const previewBtn = document.getElementById("previewBtn");
+  const startBtn = document.getElementById("startBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const rerecordBtn = document.getElementById("rerecordBtn");
+  const submitBtn = document.getElementById("submitBtn");
+  const timerEl = document.getElementById("timer");
+  const timeEl = document.getElementById("time");
+  const statusEl = document.getElementById("status");
+
+  let mediaRecorder, stream, chunks = [], recordedBlob, mimeType;
+  let timerInterval, elapsed = 0;
+  const MAX_SECONDS = 60;
+
+  async function startPreview() {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    } catch (err) {
+      statusEl.textContent = err.name === "NotAllowedError"
+        ? "Camera and microphone access is required. Please allow both in your browser settings and try again."
+        : "Could not access camera/microphone: " + err.message;
+      return;
+    }
+
+    if (!stream.getAudioTracks().length) {
+      statusEl.textContent = "Microphone access was not granted. Please allow microphone and try again.";
+      stream.getTracks().forEach(t => t.stop());
+      return;
+    }
+
+    preview.srcObject = stream;
+    preview.muted = true;
+    preview.style.display = "block";
+    statusEl.textContent = "";
+  }
+
+  // Show live preview when "Enable Camera" is clicked
+  previewBtn.onclick = async () => {
+    await startPreview();
+    if (stream) {
+      previewBtn.style.display = "none";
+      startBtn.style.display = "block";
+    }
+  };
+
+  startBtn.onclick = () => {
+    chunks = [];
+    mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
+      ? "video/webm;codecs=vp8,opus"
+      : MediaRecorder.isTypeSupported("video/mp4") ? "video/mp4" : "video/webm";
+
+    mediaRecorder = new MediaRecorder(stream, { mimeType });
+    mediaRecorder.ondataavailable = e => e.data.size > 0 && chunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      recordedBlob = new Blob(chunks, { type: mimeType });
+      preview.srcObject = null;
+      preview.muted = false;
+      preview.src = URL.createObjectURL(recordedBlob);
+      preview.controls = true;
+      rerecordBtn.style.display = "block";
+      submitBtn.style.display = "block";
+      timerEl.style.display = "none";
+    };
+
+    mediaRecorder.start(1000);
+    elapsed = 0;
+    timerEl.style.display = "block";
+    timeEl.textContent = "0:00";
+    timerInterval = setInterval(() => {
+      elapsed++;
+      const m = Math.floor(elapsed / 60);
+      const s = elapsed % 60;
+      timeEl.textContent = `${m}:${s.toString().padStart(2, "0")}`;
+      if (elapsed >= MAX_SECONDS) stopRecording();
+    }, 1000);
+
+    startBtn.style.display = "none";
+    stopBtn.style.display = "block";
+  };
+
+  stopBtn.onclick = stopRecording;
+
+  function stopRecording() {
+    clearInterval(timerInterval);
+    mediaRecorder.stop();
+    // don't stop tracks here — keep stream alive for potential re-record
+    stopBtn.style.display = "none";
+  }
+
+  rerecordBtn.onclick = async () => {
+    recordedBlob = null;
+    preview.src = "";
+    preview.controls = false;
+    preview.muted = true;
+    rerecordBtn.style.display = "none";
+    submitBtn.style.display = "none";
+    statusEl.textContent = "";
+
+    // reuse existing stream if still active, otherwise request again
+    if (stream && stream.active) {
+      preview.srcObject = stream;
+      preview.style.display = "block";
+      startBtn.style.display = "block";
+    } else {
+      await startPreview();
+      if (stream) startBtn.style.display = "block";
+    }
+  };
+
+  submitBtn.onclick = async () => {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const consent = document.getElementById("consent").checked ? "true" : "false";
+    if (!name) { alert("Please enter your name."); return; }
+    if (!recordedBlob) return;
+
+    submitBtn.disabled = true;
+    rerecordBtn.disabled = true;
+    statusEl.textContent = "Uploading...";
+
+    try {
+      const ext = mimeType.includes("mp4") ? "mp4" : "webm";
+      const filename = `testimonial-${Date.now()}.${ext}`;
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, filename, contentType: mimeType, consent }),
+      });
+      const { url } = await res.json();
+
+      await fetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": mimeType },
+        body: recordedBlob,
+      });
+
+      document.getElementById("form-section").style.display = "none";
+      document.getElementById("success").style.display = "block";
+      if (stream) stream.getTracks().forEach(t => t.stop());
+    } catch (err) {
+      statusEl.textContent = "Upload failed. Please try again.";
+      submitBtn.disabled = false;
+      rerecordBtn.disabled = false;
+    }
+  };
+</script>
+</body>
+</html>
