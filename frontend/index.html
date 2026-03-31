@@ -35,19 +35,14 @@
 <body>
 <div class="card">
   <div id="form-section">
-    <h1>Share your Testimonial for AWS course by Chetan Agrawal</h1>
+    <h1>Share your Testimonial for AWS course by Chetan</h1>
     <p class="sub">Record a short video (max 1 min) about your learning experience and outcome.</p>
 
     <label for="name">Your Name *</label>
     <input id="name" type="text" placeholder="Jane Doe" required />
 
-    <label for="email">Email (optional)</label>
+    <label for="email">Email</label>
     <input id="email" type="email" placeholder="jane@example.com" />
-
-    <div class="consent">
-      <input type="checkbox" id="consent" checked />
-      <label for="consent" style="margin:0;font-weight:normal;">I provide my consent to use this testimonial for promotional activities.</label>
-    </div>
 
     <video id="preview" autoplay playsinline></video>
     <div id="timer">⏱ <span id="time">0:00</span> / 1:00</div>
@@ -56,7 +51,14 @@
     <button id="startBtn" class="btn btn-blue" style="display:none">Start Recording</button>
     <button id="stopBtn" class="btn btn-red" style="display:none">Stop Recording</button>
     <button id="rerecordBtn" class="btn btn-rerecord" style="display:none">Re-record</button>
+
+    <div class="consent" id="consentBlock" style="display:none">
+      <input type="checkbox" id="consent" checked />
+      <label for="consent" style="margin:0;font-weight:normal;">I provide my consent to use this testimonial for promotional activities.</label>
+    </div>
+
     <button id="submitBtn" class="btn btn-primary" style="display:none">Submit Testimonial</button>
+    <div id="status"></div>
     <p style="margin-top:10px;"><em>Don't worry about editing or perfection — we'll handle that. Just speak naturally!</em></p>
     <span class="tip-link" onclick="document.getElementById('tipBox').style.display = document.getElementById('tipBox').style.display === 'block' ? 'none' : 'block'">Need help? Click for tips on what to say :)</span>
     <div class="tip-box" id="tipBox">
@@ -69,8 +71,6 @@
         <li>"I'd highly recommend this course to anyone who wants to learn AWS and get AWS certified."</li>
       </ul>
     </div>
-
-    <div id="status"></div>
   </div>
 
   <div id="success">
@@ -151,6 +151,7 @@
       preview.src = URL.createObjectURL(recordedBlob);
       preview.controls = true;
       rerecordBtn.style.display = "block";
+      document.getElementById("consentBlock").style.display = "flex";
       submitBtn.style.display = "block";
       timerEl.style.display = "none";
     };
@@ -187,6 +188,7 @@
     preview.muted = true;
     rerecordBtn.style.display = "none";
     submitBtn.style.display = "none";
+    document.getElementById("consentBlock").style.display = "none";
     statusEl.textContent = "";
 
     // reuse existing stream if still active, otherwise request again
