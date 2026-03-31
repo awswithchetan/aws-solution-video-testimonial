@@ -24,7 +24,7 @@ export const handler = async (event) => {
     },
   });
 
-  const url = await getSignedUrl(s3, command, { expiresIn: 300 });
+  const url = await getSignedUrl(s3, command, { expiresIn: 900 });
 
   return {
     statusCode: 200,

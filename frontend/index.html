@@ -20,7 +20,11 @@
     .btn-rerecord { background: #6a1b9a; color: #fff; }
     .btn-blue { background: #1565c0; color: #fff; }
     .btn-red { background: #c62828; color: #fff; }
-    .tip-link { display: inline-block; margin-top: 12px; font-size: 0.85rem; color: #1565c0; cursor: pointer; text-decoration: underline; }
+    .tip-link { display: inline-block; margin-top: 16px; font-size: 0.85rem; color: #1565c0; cursor: pointer; text-decoration: underline; }
+    .choice-row { display: flex; align-items: center; gap: 16px; margin-top: 14px; }
+    .choice-col { display: flex; flex-direction: column; align-items: flex-start; }
+    .choice-hint { font-size: 0.78rem; color: #888; margin-top: 5px; }
+    .or-text { font-size: 0.85rem; color: #999; font-weight: 600; flex-shrink: 0; }
     .tip-box { display: none; background: #f0f4ff; border-left: 4px solid #1565c0; border-radius: 6px; padding: 14px 16px; margin-top: 10px; font-size: 0.85rem; color: #333; line-height: 1.6; }
     .tip-box ul { margin: 8px 0 0 16px; }
     .consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 16px; font-size: 0.85rem; color: #444; }
@@ -47,10 +51,23 @@
     <video id="preview" autoplay playsinline></video>
     <div id="timer">⏱ <span id="time">0:00</span> / 1:00</div>
 
-    <button id="previewBtn" class="btn btn-green">Enable Camera and Microphone</button>
-    <button id="startBtn" class="btn btn-blue" style="display:none">Start Recording</button>
-    <button id="stopBtn" class="btn btn-red" style="display:none">Stop Recording</button>
-    <button id="rerecordBtn" class="btn btn-rerecord" style="display:none">Re-record</button>
+    <div id="recordSection">
+      <div id="choiceRow" class="choice-row" style="justify-content:space-between;">
+        <div class="choice-col">
+          <button id="previewBtn" class="btn btn-green" style="margin-top:0">Record Video</button>
+          <span class="choice-hint">Requires camera and microphone</span>
+        </div>
+        <div class="choice-col" style="align-items:flex-end;">
+          <button class="btn btn-blue" style="margin-top:0" onclick="document.getElementById('fileInput').click()">Upload Video</button>
+          <input type="file" id="fileInput" accept="video/*" style="display:none" />
+          <span class="choice-hint">Max 100MB</span>
+        </div>
+      </div>
+      <button id="startBtn" class="btn btn-blue" style="display:none">Start Recording</button>
+      <button id="stopBtn" class="btn btn-red" style="display:none">Stop Recording</button>
+      <button id="rerecordBtn" class="btn btn-rerecord" style="display:none">Re-record</button>
+      <video id="uploadPreview" controls style="display:none;width:100%;border-radius:8px;margin-top:12px;max-height:280px;background:#000;"></video>
+    </div>
 
     <div class="consent" id="consentBlock" style="display:none">
       <input type="checkbox" id="consent" checked />
@@ -58,8 +75,9 @@
     </div>
 
     <button id="submitBtn" class="btn btn-primary" style="display:none">Submit Testimonial</button>
+    <button id="backBtn" class="btn btn-secondary" style="display:none">← Back</button>
     <div id="status"></div>
-    <p style="margin-top:10px;"><em>Don't worry about editing or perfection — we'll handle that. Just speak naturally!</em></p>
+    <p style="margin-top:14px;font-size:0.85rem;color:#555;"><em>Don't worry about editing or perfection — we'll handle that. Just speak naturally!</em></p>
     <span class="tip-link" onclick="document.getElementById('tipBox').style.display = document.getElementById('tipBox').style.display === 'block' ? 'none' : 'block'">Need help? Click for tips on what to say :)</span>
     <div class="tip-box" id="tipBox">
       <strong>Here's a simple script to get you started:</strong>
@@ -105,6 +123,54 @@
   let timerInterval, elapsed = 0;
   const MAX_SECONDS = 60;
 
+  // --- Mode toggle ---
+  let currentMode = "record";
+  function switchMode(mode) {
+    currentMode = mode;
+    document.getElementById("modeRecord").classList.toggle("active", mode === "record");
+    document.getElementById("modeUpload").classList.toggle("active", mode === "upload");
+    document.getElementById("recordSection").style.display = mode === "record" ? "block" : "none";
+    document.getElementById("uploadSection").style.display = mode === "upload" ? "block" : "none";
+    // reset state
+    recordedBlob = null;
+    submitBtn.style.display = "none";
+    document.getElementById("consentBlock").style.display = "none";
+    statusEl.textContent = "";
+    if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+    preview.style.display = "none";
+    preview.src = "";
+    timerEl.style.display = "none";
+    rerecordBtn.style.display = "none";
+    startBtn.style.display = "none";
+    stopBtn.style.display = "none";
+    previewBtn.style.display = "block";
+    document.getElementById("uploadPreview").style.display = "none";
+  }
+
+  // --- File upload mode ---
+  document.getElementById("fileInput").onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 100 * 1024 * 1024) {
+      statusEl.textContent = "File is too large. Maximum allowed size is 100MB.";
+      e.target.value = "";
+      return;
+    }
+    statusEl.textContent = "";
+    // hide camera preview if visible
+    preview.style.display = "none";
+    preview.src = "";
+    document.getElementById("choiceRow").style.display = "none";
+    recordedBlob = file;
+    mimeType = file.type || "video/mp4";
+    const uploadPreview = document.getElementById("uploadPreview");
+    uploadPreview.src = URL.createObjectURL(file);
+    uploadPreview.style.display = "block";
+    document.getElementById("consentBlock").style.display = "flex";
+    document.getElementById("backBtn").style.display = "inline-block";
+    submitBtn.style.display = "block";
+  };
+
   async function startPreview() {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -127,13 +193,35 @@
     statusEl.textContent = "";
   }
 
-  // Show live preview when "Enable Camera" is clicked
+  // Show live preview when "Record Video" is clicked
   previewBtn.onclick = async () => {
     await startPreview();
     if (stream) {
+      document.getElementById("choiceRow").style.display = "none";
+      document.getElementById("backBtn").style.display = "inline-block";
       previewBtn.style.display = "none";
       startBtn.style.display = "block";
     }
+  };
+
+  document.getElementById("backBtn").onclick = () => {
+    if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+    preview.style.display = "none";
+    preview.src = "";
+    timerEl.style.display = "none";
+    startBtn.style.display = "none";
+    stopBtn.style.display = "none";
+    rerecordBtn.style.display = "none";
+    submitBtn.style.display = "none";
+    document.getElementById("consentBlock").style.display = "none";
+    document.getElementById("backBtn").style.display = "none";
+    document.getElementById("uploadPreview").style.display = "none";
+    document.getElementById("uploadPreview").src = "";
+    document.getElementById("fileInput").value = "";
+    document.getElementById("choiceRow").style.display = "flex";
+    previewBtn.style.display = "block";
+    statusEl.textContent = "";
+    recordedBlob = null;
   };
 
   startBtn.onclick = () => {
@@ -214,7 +302,7 @@
     statusEl.textContent = "Uploading...";
 
     try {
-      const ext = mimeType.includes("mp4") ? "mp4" : "webm";
+      const ext = mimeType.includes("mp4") ? "mp4" : mimeType.includes("mov") ? "mov" : "webm";
       const filename = `testimonial-${Date.now()}.${ext}`;
       const res = await fetch(API_URL, {
         method: "POST",
