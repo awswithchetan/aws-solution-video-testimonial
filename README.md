@@ -97,6 +97,7 @@ Create the role once with all required permissions — it will be shared by both
 3. Click **Add integration** → **Lambda** → select `testimonial-presign`
 4. Click **Next** → configure route:
    - Method: `POST`, Path: `/presign`
+   - Integration target: select `testimonial-presign`
 5. Stage name: `$default`, auto-deploy: on → **Next** → **Create**
 6. Copy the **Invoke URL** (e.g. `https://<id>.execute-api.<region>.amazonaws.com`)
 7. Go to **CORS** (left sidebar) → **Configure** → set:
