@@ -95,7 +95,7 @@ Create the role once with all required permissions — it will be shared by both
 4. Click **Next** → configure route:
    - Method: `POST`, Path: `/presign`
 5. Stage name: `$default`, auto-deploy: on → **Next** → **Create**
-6. Copy the **Invoke URL** (e.g. `https://<id>.execute-api.ap-south-1.amazonaws.com`)
+6. Copy the **Invoke URL** (e.g. `https://<id>.execute-api.<region>.amazonaws.com`)
 7. Go to **CORS** (left sidebar) → **Configure** → set:
    - Allow origins: `*`
    - Allow methods: `POST, OPTIONS`
@@ -106,7 +106,7 @@ Create the role once with all required permissions — it will be shared by both
 
 Open `frontend/index.html` and update:
 ```js
-const API_URL = "https://<id>.execute-api.ap-south-1.amazonaws.com/presign";
+const API_URL = "https://<id>.execute-api.<region>.amazonaws.com/presign";
 ```
 
 ### 6. Create CloudFront Distribution
@@ -215,7 +215,7 @@ Your app is live at: `https://<distribution-domain>.cloudfront.net`
 
 ```bash
 BUCKET=video-testimonials-<your-account-id>
-REGION=ap-south-1
+REGION=<your-region>
 
 aws s3api create-bucket \
   --bucket $BUCKET \
