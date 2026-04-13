@@ -168,16 +168,23 @@ If the policy is missing, paste the above (with your values filled in) and click
 3. Expand **Additional upload options** → set **Content type** to `text/html`
 4. Click **Upload**
 
-### 10. Deploy Lambda (notify) — Optional
+### 10. Create SNS Topic for Notifications
 
-1. Go to **SNS** → **Topics** → **Create topic** → **Standard** → name: `testimonial-notify` → **Create**
-2. Click **Create subscription** → Protocol: **Email** → enter your email → **Create subscription**
-3. Confirm the subscription from your inbox
-4. Go to **Lambda** → **Create function** → name: `testimonial-notify`, runtime: **Python 3.12**, role: `testimonial-lambda-role`
-5. In the **Code** tab, replace the default code with the contents of `lambda-notify/index.py`
-6. Click **Deploy**
-7. Add environment variable: `TOPIC_ARN` = your SNS topic ARN
-8. Go to **Configuration** → **Triggers** → **Add trigger** → **S3**
+1. Go to **SNS** → **Topics** → **Create topic** → **Standard**
+2. Name: `testimonial-notify` → **Create topic**
+3. Click **Create subscription** → Protocol: **Email** → enter your email → **Create subscription**
+4. Confirm the subscription from your inbox
+
+### 11. Deploy Lambda (notify)
+
+1. Go to **Lambda** → **Create function**
+2. Name: `testimonial-notify`, Runtime: **Python 3.12**, role: `testimonial-lambda-role`
+3. In the **Code** tab, replace the default code with the contents of `lambda-notify/index.py`
+4. Click **Deploy**
+5. Go to **Configuration** → **Environment variables** → **Edit** → Add:
+   - Key: `TOPIC_ARN`, Value: your SNS topic ARN
+6. Click **Save**
+7. Go to **Configuration** → **Triggers** → **Add trigger** → **S3**
    - Bucket: your bucket
    - Event type: **PUT**
    - Prefix: `testimonials/`
@@ -389,13 +396,9 @@ aws s3api put-bucket-cors \
 aws s3 cp frontend/index.html s3://$BUCKET/index.html --content-type text/html
 ```
 
-### 10. Deploy Lambda (notify) — Optional
+### 10. Create SNS Topic for Notifications
 
 ```bash
-cd ../lambda-notify
-npm install
-zip -r function.zip . --exclude "*.zip"
-
 SNS_TOPIC_ARN=$(aws sns create-topic --name testimonial-notify --region $REGION --query 'TopicArn' --output text)
 
 aws sns subscribe \
@@ -403,6 +406,16 @@ aws sns subscribe \
   --protocol email \
   --notification-endpoint <your-email> \
   --region $REGION
+```
+
+Confirm the subscription from your inbox before proceeding.
+
+### 11. Deploy Lambda (notify)
+
+```bash
+cd ../lambda-notify
+npm install
+zip -r function.zip . --exclude "*.zip"
 
 aws lambda create-function \
   --function-name testimonial-notify \
