@@ -3,14 +3,17 @@
 A serverless web app that lets anyone record and submit a video testimonial. Testimonial video is stored in your S3 bucket. No server required — fully hosted on AWS using S3, CloudFront, API Gateway, and Lambda.
 
 ## Architecture
+<img width="1035" height="639" alt="image" src="https://github.com/user-attachments/assets/6ce8ca3a-cf6e-40d3-8868-6c569d2eb33e" />
 
 ```
 User (Browser)
-  └── CloudFront (HTTPS) ──► S3 (index.html via OAC)
-  └── API Gateway (POST /presign) ──► Lambda ──► Pre-signed S3 URL
-  └── Browser uploads video directly to S3
-  └── S3 Event ──► Lambda (notify) ──► SNS ──► Email
-```
+1. DNS request for custom domain -> Resolved by Amazon Route53
+2. HTTPS request to CloudFront -> S3 (via OAC)
+3. User records video using browser and submits -> API gateway (POST /presign) request
+4. Triggers Lambda -> Generate S3 pre-sign URL -> Return pre-signed URL
+5. Start upload using pre-signed URL
+6. Upload complete -> S3 Event notification -> Lambda -> SNS -> Email
+
 
 ## Project Structure
 
@@ -20,10 +23,8 @@ video-testimonial/
 │   └── index.html          # Single-page web app
 ├── lambda-presign/
 │   ├── lambda_function.py  # Pre-signed URL generator (Python)
-│   └── index.mjs           # Pre-signed URL generator (Node.js)
 ├── lambda-notify/
 │   ├── lambda_function.py  # S3 event trigger → SNS email notification (Python)
-│   └── index.mjs           # S3 event trigger → SNS email notification (Node.js)
 ├── README.md
 └── .gitignore
 ```
