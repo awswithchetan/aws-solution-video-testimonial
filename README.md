@@ -203,6 +203,46 @@ Your app is live at: `https://<distribution-domain>.cloudfront.net`
 
 ---
 
+## (Optional) Custom Domain
+
+### Prerequisites
+- A registered domain name
+- Amazon Route 53 configured as the DNS provider for your domain (Hosted Zone exists)
+
+### 1. Request SSL Certificate in ACM
+
+> ⚠️ Certificate must be requested in **us-east-1** regardless of your app's region — CloudFront requires it.
+
+1. Go to **ACM** → switch to **us-east-1** region → **Request certificate** → **Request a public certificate**
+2. Add domain names: `yourdomain.com` and `www.yourdomain.com`
+3. Validation method: **DNS validation** → **Request**
+4. Open the certificate → click **Create records in Route 53** → confirm
+5. Wait for status to change to **Issued** (usually 1–2 minutes)
+
+### 2. Add Alternate Domain to CloudFront
+
+1. Go to **CloudFront** → your distribution → **Settings** → **Edit**
+2. Alternate domain names (CNAMEs): add `yourdomain.com` and `www.yourdomain.com`
+3. Custom SSL certificate: select the ACM certificate you just issued
+4. **Save changes** → wait for deployment (5–10 minutes)
+
+### 3. Create Route 53 DNS Records
+
+**Root domain (`yourdomain.com`):**
+1. Go to **Route 53** → **Hosted zones** → your domain → **Create record**
+2. Record name: leave empty, Record type: **A**, toggle **Alias** on
+3. Route traffic to: **Alias to CloudFront distribution** → select your distribution
+4. **Create records**
+
+**www subdomain:**
+1. Create another record, Record name: `www`, Record type: **A**, Alias on
+2. Route traffic to: **Alias to CloudFront distribution** → same distribution
+3. **Create records**
+
+Your app is now accessible at `https://yourdomain.com`
+
+---
+
 ## Deploy via CLI
 
 <details>
