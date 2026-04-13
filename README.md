@@ -93,7 +93,7 @@ Create the role once with all required permissions — it will be shared by both
 3. Click **Add integration** → **Lambda** → select `testimonial-presign`
 4. Click **Next** → configure route:
    - Method: `POST`, Path: `/presign`
-5. Stage name: `prod`, auto-deploy: on → **Next** → **Create**
+5. Stage name: `$default`, auto-deploy: on → **Next** → **Create**
 6. Copy the **Invoke URL** (e.g. `https://<id>.execute-api.ap-south-1.amazonaws.com`)
 7. Go to **CORS** (left sidebar) → **Configure** → set:
    - Allow origins: `*`
@@ -105,7 +105,7 @@ Create the role once with all required permissions — it will be shared by both
 
 Open `frontend/index.html` and update:
 ```js
-const API_URL = "https://<id>.execute-api.ap-south-1.amazonaws.com/prod/presign";
+const API_URL = "https://<id>.execute-api.ap-south-1.amazonaws.com/presign";
 ```
 
 ### 6. Create CloudFront OAC + Distribution
@@ -279,7 +279,7 @@ aws apigatewayv2 create-route \
 
 aws apigatewayv2 create-stage \
   --api-id $API_ID \
-  --stage-name prod \
+  --stage-name '$default' \
   --auto-deploy \
   --region $REGION
 
@@ -292,12 +292,12 @@ aws lambda add-permission \
   --region $REGION
 ```
 
-API URL: `https://<API_ID>.execute-api.<REGION>.amazonaws.com/prod/presign`
+API URL: `https://<API_ID>.execute-api.<REGION>.amazonaws.com/presign`
 
 ### 5. Update Frontend
 
 ```js
-const API_URL = "https://<API_ID>.execute-api.<REGION>.amazonaws.com/prod/presign";
+const API_URL = "https://<API_ID>.execute-api.<REGION>.amazonaws.com/presign";
 ```
 
 ### 6. Create CloudFront OAC + Distribution
