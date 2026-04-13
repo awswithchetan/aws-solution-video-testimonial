@@ -18,7 +18,7 @@ User (Browser)
 video-testimonial/
 ├── frontend/
 │   └── index.html          # Single-page web app
-├── lambda/
+├── lambda-presign/
 │   └── index.mjs           # Pre-signed URL generator
 ├── lambda-notify/
 │   └── index.mjs           # S3 event trigger → SNS email notification
@@ -78,7 +78,7 @@ Create the role once with all required permissions — it will be shared by both
 2. Name: `testimonial-presign`, Runtime: **Node.js 20.x**
 3. Execution role: **Use an existing role** → `testimonial-lambda-role`
 4. Click **Create function**
-5. In the **Code** tab → **Upload from** → **.zip file** → upload `lambda/function.zip`
+5. In the **Code** tab → **Upload from** → **.zip file** → upload `lambda-presign/function.zip`
 6. Set handler to `index.handler`
 7. Go to **Configuration** → **Environment variables** → **Edit** → Add:
    - Key: `BUCKET_NAME`, Value: `video-testimonials-<your-account-id>`
@@ -236,7 +236,7 @@ aws iam put-role-policy \
 ### 3. Deploy Lambda (presign)
 
 ```bash
-cd lambda
+cd lambda-presign
 npm install
 zip -r function.zip . --exclude "*.zip"
 
