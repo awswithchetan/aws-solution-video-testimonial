@@ -127,9 +127,14 @@ const TIP_SCRIPT = [ ... ];                           // customize the recording
 7. Leave all other settings as default
 8. Click **Create distribution**
 9. Note the **Distribution domain name** (e.g. `xxxx.cloudfront.net`) — this is your app URL
-10. Once the distribution is deployed, open it → **Settings** → **Edit** → set **Default root object** to `index.html` → **Save changes**
 
-### 7. Verify S3 Bucket Policy (CloudFront OAC)
+### 7. Set Default Root Object
+
+1. Open the distribution → **General** tab → **Edit**
+2. Set **Default root object** to `index.html`
+3. Click **Save changes**
+
+### 8. Verify S3 Bucket Policy (CloudFront OAC)
 
 CloudFront should have automatically updated the S3 bucket policy in the previous step. Verify by going to **S3** → your bucket → **Permissions** → **Bucket policy** and confirming a policy like this exists:
 
@@ -157,7 +162,7 @@ If the policy is missing, paste the above (with your values filled in) and click
 
 </details>
 
-### 8. Set S3 CORS
+### 9. Set S3 CORS
 
 1. Go to **S3** → your bucket → **Permissions** → **Cross-origin resource sharing (CORS)** → **Edit**
 2. Paste:
@@ -171,21 +176,21 @@ If the policy is missing, paste the above (with your values filled in) and click
 ```
 3. Click **Save changes**
 
-### 9. Upload Frontend to S3
+### 10. Upload Frontend to S3
 
 1. Go to **S3** → your bucket → **Upload**
 2. Upload `frontend/index.html`
 3. Expand **Additional upload options** → set **Content type** to `text/html`
 4. Click **Upload**
 
-### 10. Create SNS Topic for Notifications
+### 11. Create SNS Topic for Notifications
 
 1. Go to **SNS** → **Topics** → **Create topic** → **Standard**
 2. Name: `testimonial-notify` → **Create topic**
 3. Click **Create subscription** → Protocol: **Email** → enter your email → **Create subscription**
 4. Confirm the subscription from your inbox
 
-### 11. Deploy Lambda (notify)
+### 12. Deploy Lambda (notify)
 
 1. Go to **Lambda** → **Create function**
 2. Name: `testimonial-notify`, Runtime: **Python 3.14**
@@ -444,7 +449,7 @@ aws s3api put-bucket-cors \
 aws s3 cp frontend/index.html s3://$BUCKET/index.html --content-type text/html
 ```
 
-### 10. Create SNS Topic for Notifications
+### 11. Create SNS Topic for Notifications
 
 ```bash
 SNS_TOPIC_ARN=$(aws sns create-topic --name testimonial-notify --region $REGION --query 'TopicArn' --output text)
@@ -458,7 +463,7 @@ aws sns subscribe \
 
 Confirm the subscription from your inbox before proceeding.
 
-### 11. Deploy Lambda (notify)
+### 12. Deploy Lambda (notify)
 
 ```bash
 cd ../lambda-notify
