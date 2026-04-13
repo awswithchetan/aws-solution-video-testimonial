@@ -120,12 +120,14 @@ const TIP_SCRIPT = [ ... ];                           // customize the recording
 
 1. Go to **CloudFront** → **Distributions** → **Create distribution**
 2. Origin domain: select your S3 bucket from the dropdown
-3. When prompted to select a plan, choose **Free tier** (or **Pay-as-you-go** for newer accounts)
-4. Origin access: leave as default — CloudFront will automatically create an OAC and update the S3 bucket policy
-5. Leave all other settings as default
-6. Click **Create distribution**
-7. Note the **Distribution domain name** (e.g. `xxxx.cloudfront.net`) — this is your app URL
-8. Once the distribution is deployed, open it → **Settings** → **Edit** → set **Default root object** to `index.html` → **Save changes**
+3. Origin access: leave as default — CloudFront will automatically create an OAC and update the S3 bucket policy
+4. Click **Next**
+5. When prompted for security protections, select **Do not enable security protections**
+6. When prompted to select a plan, choose **Free tier** (or **Pay-as-you-go** for newer accounts)
+7. Leave all other settings as default
+8. Click **Create distribution**
+9. Note the **Distribution domain name** (e.g. `xxxx.cloudfront.net`) — this is your app URL
+10. Once the distribution is deployed, open it → **Settings** → **Edit** → set **Default root object** to `index.html` → **Save changes**
 
 ### 7. Verify S3 Bucket Policy (CloudFront OAC)
 
