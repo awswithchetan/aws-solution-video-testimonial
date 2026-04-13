@@ -212,6 +212,8 @@ Your app is live at: `https://<distribution-domain>.cloudfront.net`
 - A registered domain name
 - Amazon Route 53 configured as the DNS provider for your domain (Hosted Zone exists)
 
+> Need help? Watch [How to buy a domain and configure Route 53](https://youtu.be/vaI5rSNtBf0) on YouTube.
+
 ### 1. Request SSL Certificate in ACM
 
 > ⚠️ Certificate must be requested in **us-east-1** regardless of your app's region — CloudFront requires it.
