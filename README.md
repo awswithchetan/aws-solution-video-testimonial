@@ -101,9 +101,9 @@ Create the role once with all required permissions — it will be shared by both
 5. Stage name: `$default`, auto-deploy: on → **Next** → **Create**
 6. Copy the **Invoke URL** (e.g. `https://<id>.execute-api.<region>.amazonaws.com`)
 7. Go to **CORS** (left sidebar) → **Configure** → set:
-   - Allow origins: `*`
-   - Allow methods: `POST, OPTIONS`
-   - Allow headers: `Content-Type`
+   - Allow origins: `*` → click **Add**
+   - Allow methods: `POST, OPTIONS` → click **Add**
+   - Allow headers: `Content-Type` → click **Add**
    - Click **Save**
 
 ### 5. Update Frontend
