@@ -19,9 +19,11 @@ video-testimonial/
 ├── frontend/
 │   └── index.html          # Single-page web app
 ├── lambda-presign/
-│   └── index.mjs           # Pre-signed URL generator
+│   ├── index.py            # Pre-signed URL generator (Python)
+│   └── index.mjs           # Pre-signed URL generator (Node.js)
 ├── lambda-notify/
-│   └── index.mjs           # S3 event trigger → SNS email notification
+│   ├── index.py            # S3 event trigger → SNS email notification (Python)
+│   └── index.mjs           # S3 event trigger → SNS email notification (Node.js)
 ├── README.md
 └── .gitignore
 ```
@@ -75,11 +77,11 @@ Create the role once with all required permissions — it will be shared by both
 ### 3. Deploy Lambda (presign)
 
 1. Go to **Lambda** → **Create function**
-2. Name: `testimonial-presign`, Runtime: **Node.js 20.x**
+2. Name: `testimonial-presign`, Runtime: **Python 3.12**
 3. Execution role: **Use an existing role** → `testimonial-lambda-role`
 4. Click **Create function**
-5. In the **Code** tab → **Upload from** → **.zip file** → upload `lambda-presign/function.zip`
-6. Set handler to `index.handler`
+5. In the **Code** tab, replace the default code with the contents of `lambda-presign/index.py`
+6. Click **Deploy**
 7. Go to **Configuration** → **Environment variables** → **Edit** → Add:
    - Key: `BUCKET_NAME`, Value: `video-testimonials-<your-account-id>`
 8. Click **Save**
@@ -168,9 +170,9 @@ const API_URL = "https://<id>.execute-api.ap-south-1.amazonaws.com/prod/presign"
 1. Go to **SNS** → **Topics** → **Create topic** → **Standard** → name: `testimonial-notify` → **Create**
 2. Click **Create subscription** → Protocol: **Email** → enter your email → **Create subscription**
 3. Confirm the subscription from your inbox
-4. Go to **Lambda** → **Create function** → name: `testimonial-notify`, runtime: **Node.js 20.x**, role: `testimonial-lambda-role`
-5. Upload `lambda-notify/function.zip`
-6. Set handler to `index.handler`
+4. Go to **Lambda** → **Create function** → name: `testimonial-notify`, runtime: **Python 3.12**, role: `testimonial-lambda-role`
+5. In the **Code** tab, replace the default code with the contents of `lambda-notify/index.py`
+6. Click **Deploy**
 7. Add environment variable: `TOPIC_ARN` = your SNS topic ARN
 8. Go to **Configuration** → **Triggers** → **Add trigger** → **S3**
    - Bucket: your bucket
