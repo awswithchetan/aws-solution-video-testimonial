@@ -119,11 +119,11 @@ const TIP_SCRIPT = [ ... ];                           // customize the recording
 ### 6. Create CloudFront Distribution
 
 1. Go to **CloudFront** → **Distributions** → **Create distribution**
-2. Origin domain: select your S3 bucket from the dropdown
-3. Origin access: leave as default — CloudFront will automatically create an OAC and update the S3 bucket policy
-4. Click **Next**
-5. When prompted for security protections, select **Do not enable security protections**
-6. When prompted to select a plan, choose **Free tier** (or **Pay-as-you-go** for newer accounts)
+2. When prompted to select a plan, choose **Free tier** (or **Pay-as-you-go** for newer accounts)
+3. Origin domain: select your S3 bucket from the dropdown
+4. Origin access: leave as default — CloudFront will automatically create an OAC and update the S3 bucket policy
+5. Click **Next**
+6. When prompted for security protections, select **Do not enable security protections**
 7. Leave all other settings as default
 8. Click **Create distribution**
 9. Note the **Distribution domain name** (e.g. `xxxx.cloudfront.net`) — this is your app URL
