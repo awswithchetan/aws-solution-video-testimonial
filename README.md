@@ -179,17 +179,20 @@ If the policy is missing, paste the above (with your values filled in) and click
 ### 11. Deploy Lambda (notify)
 
 1. Go to **Lambda** → **Create function**
-2. Name: `testimonial-notify`, Runtime: **Python 3.13**, role: `testimonial-lambda-role`
-3. In the **Code** tab, replace the default code with the contents of `lambda-notify/lambda_function.py`
-4. Click **Deploy**
-5. Go to **Configuration** → **Environment variables** → **Edit** → Add:
+2. Name: `testimonial-notify`, Runtime: **Python 3.13**
+3. Execution role: **Use an existing role** → `testimonial-lambda-role`
+4. Click **Create function**
+5. In the **Code** tab, replace the default code with the contents of `lambda-notify/lambda_function.py`
+6. Click **Deploy**
+7. Go to **Configuration** → **General configuration** → **Edit** → set **Timeout** to `0 min 30 sec` → **Save**
+8. Go to **Configuration** → **Environment variables** → **Edit** → Add:
    - Key: `TOPIC_ARN`, Value: your SNS topic ARN
-6. Click **Save**
-7. Go to **Configuration** → **Triggers** → **Add trigger** → **S3**
-   - Bucket: your bucket
-   - Event type: **PUT**
-   - Prefix: `testimonials/`
-   - Click **Add**
+9. Click **Save**
+10. Go to **Configuration** → **Triggers** → **Add trigger** → **S3**
+    - Bucket: your bucket
+    - Event type: **PUT**
+    - Prefix: `testimonials/`
+    - Click **Add**
 
 ### Done
 
@@ -205,7 +208,7 @@ Your app is live at: `https://<distribution-domain>.cloudfront.net`
 ### Prerequisites
 
 - AWS CLI configured (`aws configure`)
-- Node.js 18+ installed
+- Python 3.13+ installed
 - `zip` utility installed
 
 ### 1. Create S3 Bucket
@@ -250,16 +253,16 @@ aws iam put-role-policy \
 
 ```bash
 cd lambda-presign
-npm install
-zip -r function.zip . --exclude "*.zip"
+zip -j function.zip lambda_function.py
 
 # Wait ~10s after role creation for IAM propagation
 aws lambda create-function \
   --function-name testimonial-presign \
-  --runtime nodejs20.x \
+  --runtime python3.13 \
   --role arn:aws:iam::<ACCOUNT_ID>:role/testimonial-lambda-role \
-  --handler index.handler \
+  --handler lambda_function.lambda_handler \
   --zip-file fileb://function.zip \
+  --timeout 30 \
   --environment Variables={BUCKET_NAME=$BUCKET} \
   --region $REGION
 ```
@@ -370,10 +373,6 @@ aws s3api put-bucket-policy \
       }
     }]
   }"
-
-aws s3api put-public-access-block \
-  --bucket $BUCKET \
-  --public-access-block-configuration "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
 ```
 
 ### 8. Set S3 CORS
@@ -415,15 +414,15 @@ Confirm the subscription from your inbox before proceeding.
 
 ```bash
 cd ../lambda-notify
-npm install
-zip -r function.zip . --exclude "*.zip"
+zip -j function.zip lambda_function.py
 
 aws lambda create-function \
   --function-name testimonial-notify \
-  --runtime nodejs20.x \
+  --runtime python3.13 \
   --role arn:aws:iam::<ACCOUNT_ID>:role/testimonial-lambda-role \
-  --handler index.handler \
+  --handler lambda_function.lambda_handler \
   --zip-file fileb://function.zip \
+  --timeout 30 \
   --environment Variables={TOPIC_ARN=$SNS_TOPIC_ARN} \
   --region $REGION
 
@@ -446,7 +445,7 @@ aws s3api put-bucket-notification-configuration \
   }"
 ```
 
-### 11. (Optional) Custom Domain
+### 12. (Optional) Custom Domain
 
 1. Issue an ACM certificate in `us-east-1` for your domain
 2. Add the domain as a CloudFront alias and attach the cert
@@ -458,7 +457,7 @@ aws s3api put-bucket-notification-configuration \
 
 ## Viewing Submissions
 
-Videos are stored under `s3://<bucket>/testimonials/`. Each object has metadata:
+Videos are stored under `s3://<bucket>/testimonials/`. Each video has a companion `.json` file with the submitter's details:
 - `name` — submitter's name
 - `email` — submitter's email (if provided)
 - `consent` — `true` / `false`
