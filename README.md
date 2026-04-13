@@ -183,6 +183,11 @@ If the policy is missing, paste the above (with your values filled in) and click
 3. Expand **Additional upload options** → set **Content type** to `text/html`
 4. Click **Upload**
 
+Or via CLI:
+```bash
+aws s3 cp frontend/index.html s3://<your-bucket>/index.html --content-type text/html
+```
+
 ### 11. Create SNS Topic for Notifications
 
 1. Go to **SNS** → **Topics** → **Create topic** → **Standard**
@@ -208,7 +213,7 @@ If the policy is missing, paste the above (with your values filled in) and click
     - Prefix: `testimonials/`
     - Click **Add**
 
-### Done
+### Congratulations 🎉
 
 Your app is live at: `https://<distribution-domain>.cloudfront.net`
 
