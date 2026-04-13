@@ -19,10 +19,10 @@ video-testimonial/
 ├── frontend/
 │   └── index.html          # Single-page web app
 ├── lambda-presign/
-│   ├── index.py            # Pre-signed URL generator (Python)
+│   ├── lambda_function.py  # Pre-signed URL generator (Python)
 │   └── index.mjs           # Pre-signed URL generator (Node.js)
 ├── lambda-notify/
-│   ├── index.py            # S3 event trigger → SNS email notification (Python)
+│   ├── lambda_function.py  # S3 event trigger → SNS email notification (Python)
 │   └── index.mjs           # S3 event trigger → SNS email notification (Node.js)
 ├── README.md
 └── .gitignore
@@ -77,14 +77,15 @@ Create the role once with all required permissions — it will be shared by both
 ### 3. Deploy Lambda (presign)
 
 1. Go to **Lambda** → **Create function**
-2. Name: `testimonial-presign`, Runtime: **Python 3.12**
+2. Name: `testimonial-presign`, Runtime: **Python 3.13**
 3. Execution role: **Use an existing role** → `testimonial-lambda-role`
 4. Click **Create function**
-5. In the **Code** tab, replace the default code with the contents of `lambda-presign/index.py`
+5. In the **Code** tab, replace the default code with the contents of `lambda-presign/lambda_function.py`
 6. Click **Deploy**
-7. Go to **Configuration** → **Environment variables** → **Edit** → Add:
+7. Go to **Configuration** → **General configuration** → **Edit** → set **Timeout** to `0 min 30 sec` → **Save**
+8. Go to **Configuration** → **Environment variables** → **Edit** → Add:
    - Key: `BUCKET_NAME`, Value: `video-testimonials-<your-account-id>`
-8. Click **Save**
+9. Click **Save**
 
 ### 4. Create API Gateway
 
@@ -178,8 +179,8 @@ If the policy is missing, paste the above (with your values filled in) and click
 ### 11. Deploy Lambda (notify)
 
 1. Go to **Lambda** → **Create function**
-2. Name: `testimonial-notify`, Runtime: **Python 3.12**, role: `testimonial-lambda-role`
-3. In the **Code** tab, replace the default code with the contents of `lambda-notify/index.py`
+2. Name: `testimonial-notify`, Runtime: **Python 3.13**, role: `testimonial-lambda-role`
+3. In the **Code** tab, replace the default code with the contents of `lambda-notify/lambda_function.py`
 4. Click **Deploy**
 5. Go to **Configuration** → **Environment variables** → **Edit** → Add:
    - Key: `TOPIC_ARN`, Value: your SNS topic ARN

@@ -9,7 +9,7 @@ sns = boto3.client("sns")
 TOPIC_ARN = os.environ["TOPIC_ARN"]
 IST = timezone(timedelta(hours=5, minutes=30))
 
-def handler(event, context):
+def lambda_handler(event, context):
     record = event["Records"][0]
     bucket = record["s3"]["bucket"]["name"]
     key = urllib.parse.unquote_plus(record["s3"]["object"]["key"])

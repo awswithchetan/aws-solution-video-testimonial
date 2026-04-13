@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 s3 = boto3.client("s3")
 BUCKET = os.environ["BUCKET_NAME"]
 
-def handler(event, context):
+def lambda_handler(event, context):
     try:
         body = json.loads(event.get("body") or "{}")
     except json.JSONDecodeError:
