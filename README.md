@@ -1,6 +1,8 @@
 # Video Testimonial App
 
-A serverless web app that lets anyone record and submit a video testimonial. Testimonial video is stored in your S3 bucket. No server required — fully hosted on AWS using S3, CloudFront, API Gateway, and Lambda.
+A serverless web app to ask for video testimonial for your product or services. Testimonial video can be recorded using mobile phone or desktop and when submitted its uploaded to your private S3 bucket. 
+
+No server required — fully hosted on AWS using S3, CloudFront, API Gateway, and Lambda.
 
 ## Architecture
 <img width="1035" height="639" alt="image" src="https://github.com/user-attachments/assets/6ce8ca3a-cf6e-40d3-8868-6c569d2eb33e" />
@@ -13,7 +15,7 @@ User (Browser)
 4. Triggers Lambda -> Generate S3 pre-sign URL -> Return pre-signed URL
 5. Start upload using pre-signed URL
 6. Upload complete -> S3 Event notification -> Lambda -> SNS -> Email
-
+```
 
 ## Project Structure
 
