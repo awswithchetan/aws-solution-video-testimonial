@@ -80,8 +80,8 @@ Create the role once with all required permissions — it will be shared by both
 ### 3. Deploy Lambda (presign)
 
 1. Go to **Lambda** → **Create function**
-2. Name: `testimonial-presign`, Runtime: **Python 3.13**
-3. Execution role: **Use an existing role** → `testimonial-lambda-role`
+2. Name: `testimonial-presign`, Runtime: **Python 3.14**
+3. Expand **Change default execution role** → select **Use an existing role** → `testimonial-lambda-role`
 4. Click **Create function**
 5. In the **Code** tab, replace the default code with the contents of `lambda-presign/lambda_function.py`
 6. Click **Deploy**
@@ -185,8 +185,8 @@ If the policy is missing, paste the above (with your values filled in) and click
 ### 11. Deploy Lambda (notify)
 
 1. Go to **Lambda** → **Create function**
-2. Name: `testimonial-notify`, Runtime: **Python 3.13**
-3. Execution role: **Use an existing role** → `testimonial-lambda-role`
+2. Name: `testimonial-notify`, Runtime: **Python 3.14**
+3. Expand **Change default execution role** → select **Use an existing role** → `testimonial-lambda-role`
 4. Click **Create function**
 5. In the **Code** tab, replace the default code with the contents of `lambda-notify/lambda_function.py`
 6. Click **Deploy**
@@ -250,7 +250,7 @@ Your app is now accessible at `https://testimonial.yourdomain.com`
 ### Prerequisites
 
 - AWS CLI configured (`aws configure`)
-- Python 3.13+ installed
+- Python 3.14+ installed
 - `zip` utility installed
 
 ### 1. Create S3 Bucket
