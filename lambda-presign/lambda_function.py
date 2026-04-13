@@ -2,7 +2,6 @@ import json
 import os
 import time
 import boto3
-from botocore.exceptions import ClientError
 
 s3 = boto3.client("s3")
 BUCKET = os.environ["BUCKET_NAME"]
@@ -24,9 +23,16 @@ def lambda_handler(event, context):
 
     key = f"testimonials/{int(time.time() * 1000)}-{filename}"
 
-    metadata = {"name": name, "consent": consent}
+    # Store metadata as a companion JSON file (avoids metadata headers in presigned URL signature)
+    meta = {"name": name, "consent": consent, "video": key}
     if email:
-        metadata["email"] = email
+        meta["email"] = email
+    s3.put_object(
+        Bucket=BUCKET,
+        Key=key + ".json",
+        Body=json.dumps(meta),
+        ContentType="application/json",
+    )
 
     url = s3.generate_presigned_url(
         "put_object",
@@ -34,7 +40,6 @@ def lambda_handler(event, context):
             "Bucket": BUCKET,
             "Key": key,
             "ContentType": content_type,
-            "Metadata": metadata,
         },
         ExpiresIn=900,
     )

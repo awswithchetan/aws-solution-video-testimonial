@@ -1,3 +1,4 @@
+import json
 import os
 import urllib.parse
 from datetime import datetime, timezone, timedelta
@@ -13,12 +14,21 @@ def lambda_handler(event, context):
     record = event["Records"][0]
     bucket = record["s3"]["bucket"]["name"]
     key = urllib.parse.unquote_plus(record["s3"]["object"]["key"])
+
+    # Skip companion metadata files
+    if key.endswith(".json"):
+        return
+
     size_kb = round(record["s3"]["object"]["size"] / 1024)
     uploaded_at = datetime.fromisoformat(record["eventTime"].replace("Z", "+00:00")) \
                           .astimezone(IST).strftime("%d/%m/%Y, %I:%M:%S %p")
 
-    head = s3.head_object(Bucket=bucket, Key=key)
-    meta = head.get("Metadata", {})
+    # Read companion JSON for metadata
+    try:
+        meta_obj = s3.get_object(Bucket=bucket, Key=key + ".json")
+        meta = json.loads(meta_obj["Body"].read())
+    except Exception:
+        meta = {}
 
     name = meta.get("name", "Unknown")
     email = meta.get("email", "Not provided")
