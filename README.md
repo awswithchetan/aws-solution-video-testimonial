@@ -455,6 +455,21 @@ aws s3api put-bucket-notification-configuration \
 
 ---
 
+## Cleanup
+
+To delete all resources and avoid ongoing charges:
+
+1. **S3** → your bucket → **Empty** the bucket first, then **Delete** it
+2. **Lambda** → delete `testimonial-presign` and `testimonial-notify`
+3. **API Gateway** → delete `testimonial-api`
+4. **CloudFront** → disable the distribution first → wait for it to deploy → then **Delete** it
+5. **SNS** → delete the `testimonial-notify` topic
+6. **IAM** → delete the `testimonial-lambda-role` role
+
+> CloudFront must be disabled before it can be deleted. Disabling takes a few minutes to propagate.
+
+---
+
 ## Viewing Submissions
 
 Videos are stored under `s3://<bucket>/testimonials/`. Each video has a companion `.json` file with the submitter's details:
