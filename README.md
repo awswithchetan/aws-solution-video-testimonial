@@ -108,24 +108,24 @@ Open `frontend/index.html` and update:
 const API_URL = "https://<id>.execute-api.ap-south-1.amazonaws.com/presign";
 ```
 
-### 6. Create CloudFront OAC + Distribution
+### 6. Create CloudFront Distribution
 
-1. Go to **CloudFront** → **Origin access** → **Create control setting**
-2. Name: `testimonial-oac`, Origin type: **S3**, Signing: **Sign requests (recommended)** → **Create**
-3. Go to **Distributions** → **Create distribution**
-4. Origin domain: select your S3 bucket from the dropdown
-5. Origin access: **Origin access control settings** → select `testimonial-oac`
-6. Click **Update bucket policy** when prompted (or do it manually in step 7)
-7. Default root object: `index.html`
-8. Viewer protocol policy: **Redirect HTTP to HTTPS**
-9. Click **Create distribution**
-10. Note the **Distribution domain name** (e.g. `xxxx.cloudfront.net`) — this is your app URL
-11. Note the **Distribution ID** for the next step
+1. Go to **CloudFront** → **Distributions** → **Create distribution**
+2. Origin domain: select your S3 bucket from the dropdown
+3. When prompted to select a plan, choose **Free tier** (or **Pay-as-you-go** for newer accounts)
+4. Origin access: leave as default — CloudFront will automatically create an OAC and update the S3 bucket policy
+5. Leave all other settings as default
+6. Click **Create distribution**
+7. Note the **Distribution domain name** (e.g. `xxxx.cloudfront.net`) — this is your app URL
+8. Once the distribution is deployed, open it → **Settings** → **Edit** → set **Default root object** to `index.html` → **Save changes**
 
-### 7. Set S3 Bucket Policy (CloudFront OAC only)
+### 7. Verify S3 Bucket Policy (CloudFront OAC)
 
-1. Go to **S3** → your bucket → **Permissions** → **Bucket policy** → **Edit**
-2. Paste (replace placeholders):
+CloudFront should have automatically updated the S3 bucket policy in the previous step. Verify by going to **S3** → your bucket → **Permissions** → **Bucket policy** and confirming a policy like this exists:
+
+<details>
+<summary>Expected bucket policy (click to expand)</summary>
+
 ```json
 {
   "Version": "2012-10-17",
@@ -142,7 +142,10 @@ const API_URL = "https://<id>.execute-api.ap-south-1.amazonaws.com/presign";
   }]
 }
 ```
-3. Click **Save changes**
+
+If the policy is missing, paste the above (with your values filled in) and click **Save changes**.
+
+</details>
 
 ### 8. Set S3 CORS
 
