@@ -104,9 +104,12 @@ Create the role once with all required permissions — it will be shared by both
 
 ### 5. Update Frontend
 
-Open `frontend/index.html` and update:
+Open `frontend/index.html` and update the config block at the top of the `<script>` section:
 ```js
-const API_URL = "https://<id>.execute-api.<region>.amazonaws.com/presign";
+const API_URL    = "https://<id>.execute-api.<region>.amazonaws.com/presign"; // your API Gateway URL
+const PAGE_TITLE    = "Share your Testimonial";       // customize the page heading
+const PAGE_SUBTITLE = "Record a short video ...";     // customize the subheading
+const TIP_SCRIPT = [ ... ];                           // customize the recording tips
 ```
 
 ### 6. Create CloudFront Distribution
@@ -311,7 +314,10 @@ API URL: `https://<API_ID>.execute-api.<REGION>.amazonaws.com/presign`
 ### 5. Update Frontend
 
 ```js
-const API_URL = "https://<API_ID>.execute-api.<REGION>.amazonaws.com/presign";
+const API_URL    = "https://<API_ID>.execute-api.<REGION>.amazonaws.com/presign";
+const PAGE_TITLE    = "Share your Testimonial";
+const PAGE_SUBTITLE = "Record a short video ...";
+const TIP_SCRIPT = [ ... ];
 ```
 
 ### 6. Create CloudFront OAC + Distribution

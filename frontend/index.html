@@ -40,8 +40,8 @@
 <body>
 <div class="card">
   <div id="form-section">
-    <h1>Share your Testimonial</h1>
-    <p class="sub">Record a short video (max 1 min) about your experience.</p>
+    <h1></h1>
+    <p class="sub"></p>
 
     <label for="name">Your Name *</label>
     <input id="name" type="text" placeholder="Jane Doe" required />
@@ -83,13 +83,7 @@
     <span class="tip-link" onclick="document.getElementById('tipBox').style.display = document.getElementById('tipBox').style.display === 'block' ? 'none' : 'block'">Need help? Click for tips on what to say :)</span>
     <div class="tip-box" id="tipBox">
       <strong>Here's a simple script to get you started:</strong>
-      <ul>
-        <li>"Hi, I'm [your name] and I recently [purchased / used / tried] [product or service name]."</li>
-        <li>"Before this, I [struggled with / was looking for] [problem it solves]."</li>
-        <li>"What I liked most was [specific feature, quality, experience, etc.]."</li>
-        <li>"Since using it, I [specific result or improvement you experienced]."</li>
-        <li>"I'd highly recommend it to anyone who [target audience or use case]."</li>
-      </ul>
+      <ul></ul>
     </div>
   </div>
 
@@ -100,7 +94,22 @@
 </div>
 
 <script>
-  const API_URL = "https://zmvs3q1f2d.execute-api.ap-south-1.amazonaws.com/presign";
+  // ─── Configuration ───────────────────────────────────────────────────────────
+  const API_URL   = "https://<id>.execute-api.<region>.amazonaws.com/presign"; // Required: your API Gateway URL
+  const PAGE_TITLE   = "Share your Testimonial";                               // Page heading
+  const PAGE_SUBTITLE = "Record a short video (max 1 min) about your experience."; // Subheading
+  const TIP_SCRIPT = [
+    "Hi, I'm [your name] and I recently [purchased / used / tried] [product or service name].",
+    "Before this, I [struggled with / was looking for] [problem it solves].",
+    "What I liked most was [specific feature, quality, experience, etc.].",
+    "Since using it, I [specific result or improvement you experienced].",
+    "I'd highly recommend it to anyone who [target audience or use case].",
+  ];
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  document.querySelector("h1").textContent = PAGE_TITLE;
+  document.querySelector("p.sub").textContent = PAGE_SUBTITLE;
+  document.querySelector("#tipBox ul").innerHTML = TIP_SCRIPT.map(t => `<li>"${t}"</li>`).join("");
 
   // iOS Chrome doesn't support MediaRecorder — must use Safari on iOS
   const isIOSChrome = /iphone|ipad|ipod/i.test(navigator.userAgent) && /CriOS/i.test(navigator.userAgent);
