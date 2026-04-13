@@ -3,7 +3,7 @@ import os
 import time
 import boto3
 
-REGION = os.environ.get("AWS_REGION", "ap-south-1")
+REGION = os.environ["AWS_REGION"]
 s3 = boto3.client("s3", region_name=REGION, endpoint_url=f"https://s3.{REGION}.amazonaws.com")
 BUCKET = os.environ["BUCKET_NAME"]
 
