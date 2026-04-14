@@ -2,7 +2,7 @@
 
 A serverless web app to ask for video testimonial for your product or services. Testimonial video can be recorded using mobile phone or desktop and when submitted its uploaded to your private S3 bucket. 
 
-No server required — fully hosted on AWS using S3, CloudFront, API Gateway, and Lambda.
+This is fully Serverless Application hosted on AWS using Amazon S3, CloudFront, API Gateway, Lambda and SNS.
 
 ## Architecture
 <img width="1035" height="639" alt="image" src="https://github.com/user-attachments/assets/6ce8ca3a-cf6e-40d3-8868-6c569d2eb33e" />
@@ -35,20 +35,18 @@ video-testimonial/
 
 ## Prerequisites
 
-1. **AWS Account and IAM User** — An AWS account with an IAM user that has sufficient permissions to create S3, Lambda, API Gateway, CloudFront, SNS, and IAM resources
-2. **Local Workstation** — To clone this repository and edit `frontend/index.html`
-3. **AWS CLI** (optional, for CLI deployment or uploading frontend) — [Install and configure](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with `aws configure`
-4. **Public Hosted Zone in Route 53** (optional, only for custom domain) — A registered domain with Route 53 as the DNS provider
+1. **AWS Account and IAM User** — An AWS account with an IAM user with admin access (Access for S3, Lambda, API Gateway, CloudFront, SNS, and IAM resources)
+2. **Local Workstation** — To clone this repository and modify/upload frontend code
+3. **AWS CLI** — [Install and configure](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+4. **Public Hosted Zone in Route 53** (optional) — A registered domain with Route 53 as the DNS provider
 
 > Need help with any of the above? Check out my [AWS YouTube playlist](https://www.youtube.com/playlist?list=PLIUhw5xEbE-WI2s0qoo3tKaiVlkz0pLIl).
 
 ---
 
-## Deploy via AWS Console (No CLI)
+## Deployment Steps
 
----
-
-### Phase 1 — Frontend Infrastructure
+### Module 1 — Frontend Infrastructure
 
 ### 1. Create S3 Bucket
 
@@ -120,7 +118,7 @@ If the policy is missing, paste the above (with your values filled in) and click
 
 ---
 
-### Phase 2 — Backend
+### Module 2 — Backend
 
 ### 6. Create IAM Role for Lambda
 
@@ -171,7 +169,7 @@ Create the role once with all required permissions — it will be shared by both
 
 ---
 
-### Phase 3 — API Layer
+### Module 3 — API Layer
 
 ### 8. Create API Gateway
 
@@ -191,7 +189,7 @@ Create the role once with all required permissions — it will be shared by both
 
 ---
 
-### Phase 4 — Integration & Test
+### Module 4 — Integration & Test
 
 ### 9. Update Frontend
 
@@ -228,7 +226,7 @@ If the upload succeeds, your app is fully working. Steps 11–12 below add email
 
 ---
 
-### Phase 5 — Notifications
+### Module 5 — Notifications
 
 ### 11. Create SNS Topic for Notifications
 
@@ -261,7 +259,7 @@ Your app is live at: `https://<distribution-domain>.cloudfront.net`
 
 ---
 
-## (Optional) Custom Domain
+## (Optional) Custom Domain and SSL
 
 ### Prerequisites
 - A registered domain name
