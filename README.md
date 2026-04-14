@@ -259,7 +259,7 @@ Your app is live at: `https://<distribution-domain>.cloudfront.net`
 
 ---
 
-## (Optional) Custom Domain and SSL
+##  (Optional) Module 6 - Custom Domain and SSL
 
 ### Prerequisites
 - A registered domain name
@@ -553,7 +553,7 @@ aws s3api put-bucket-notification-configuration \
 
 ---
 
-## Cleanup
+## Module 7 - Cleanup
 
 To delete all resources and avoid ongoing charges:
 
