@@ -35,6 +35,10 @@ video-testimonial/
 
 ## Deploy via AWS Console (No CLI)
 
+---
+
+### Phase 1 — Frontend Infrastructure
+
 ### 1. Create S3 Bucket
 
 1. Go to **S3** → **Create bucket**
@@ -43,7 +47,71 @@ video-testimonial/
 4. Leave all **Block Public Access** settings ON (bucket stays private)
 5. Click **Create bucket**
 
-### 2. Create IAM Role for Lambda
+### 2. Create CloudFront Distribution
+
+1. Go to **CloudFront** → **Distributions** → **Create distribution**
+2. When prompted to select a plan, choose **Free tier** (or **Pay-as-you-go** for newer accounts)
+3. Origin domain: select your S3 bucket from the dropdown
+4. Origin access: leave as default — CloudFront will automatically create an OAC and update the S3 bucket policy
+5. Click **Next**
+6. When prompted for security protections, select **Do not enable security protections**
+7. Leave all other settings as default
+8. Click **Create distribution**
+9. Note the **Distribution domain name** (e.g. `xxxx.cloudfront.net`) — this is your app URL
+
+### 3. Set Default Root Object
+
+1. Open the distribution → **General** tab → **Edit**
+2. Set **Default root object** to `index.html`
+3. Click **Save changes**
+
+### 4. Verify S3 Bucket Policy (CloudFront OAC)
+
+CloudFront should have automatically updated the S3 bucket policy. Verify by going to **S3** → your bucket → **Permissions** → **Bucket policy** and confirming a policy like this exists:
+
+<details>
+<summary>Expected bucket policy (click to expand)</summary>
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": {"Service": "cloudfront.amazonaws.com"},
+    "Action": "s3:GetObject",
+    "Resource": "arn:aws:s3:::video-testimonials-<your-account-id>/*",
+    "Condition": {
+      "StringEquals": {
+        "AWS:SourceArn": "arn:aws:cloudfront::<your-account-id>:distribution/<distribution-id>"
+      }
+    }
+  }]
+}
+```
+
+If the policy is missing, paste the above (with your values filled in) and click **Save changes**.
+
+</details>
+
+### 5. Set S3 CORS
+
+1. Go to **S3** → your bucket → **Permissions** → **Cross-origin resource sharing (CORS)** → **Edit**
+2. Paste:
+```json
+[{
+  "AllowedOrigins": ["*"],
+  "AllowedMethods": ["PUT", "GET"],
+  "AllowedHeaders": ["*"],
+  "MaxAgeSeconds": 3000
+}]
+```
+3. Click **Save changes**
+
+---
+
+### Phase 2 — Backend
+
+### 6. Create IAM Role for Lambda
 
 Create the role once with all required permissions — it will be shared by both Lambda functions.
 
@@ -77,7 +145,7 @@ Create the role once with all required permissions — it will be shared by both
 ```
 7. Policy name: `testimonial-lambda-policy` → **Create policy**
 
-### 3. Deploy Lambda (presign)
+### 7. Deploy Lambda (presign)
 
 1. Go to **Lambda** → **Create function**
 2. Name: `testimonial-presign`, Runtime: **Python 3.14**
@@ -90,7 +158,11 @@ Create the role once with all required permissions — it will be shared by both
    - Key: `BUCKET_NAME`, Value: `video-testimonials-<your-account-id>`
 9. Click **Save**
 
-### 4. Create API Gateway
+---
+
+### Phase 3 — API Layer
+
+### 8. Create API Gateway
 
 1. Go to **API Gateway** → **Create API** → **HTTP API** → **Build**
 2. Name: `testimonial-api`
@@ -106,7 +178,11 @@ Create the role once with all required permissions — it will be shared by both
    - Allow headers: `Content-Type` → click **Add**
    - Click **Save**
 
-### 5. Update Frontend
+---
+
+### Phase 4 — Integration & Test
+
+### 9. Update Frontend
 
 Open `frontend/index.html` and update the config block at the top of the `<script>` section:
 ```js
@@ -115,66 +191,6 @@ const PAGE_TITLE    = "Share your Testimonial";       // customize the page head
 const PAGE_SUBTITLE = "Record a short video ...";     // customize the subheading
 const TIP_SCRIPT = [ ... ];                           // customize the recording tips
 ```
-
-### 6. Create CloudFront Distribution
-
-1. Go to **CloudFront** → **Distributions** → **Create distribution**
-2. When prompted to select a plan, choose **Free tier** (or **Pay-as-you-go** for newer accounts)
-3. Origin domain: select your S3 bucket from the dropdown
-4. Origin access: leave as default — CloudFront will automatically create an OAC and update the S3 bucket policy
-5. Click **Next**
-6. When prompted for security protections, select **Do not enable security protections**
-7. Leave all other settings as default
-8. Click **Create distribution**
-9. Note the **Distribution domain name** (e.g. `xxxx.cloudfront.net`) — this is your app URL
-
-### 7. Set Default Root Object
-
-1. Open the distribution → **General** tab → **Edit**
-2. Set **Default root object** to `index.html`
-3. Click **Save changes**
-
-### 8. Verify S3 Bucket Policy (CloudFront OAC)
-
-CloudFront should have automatically updated the S3 bucket policy in the previous step. Verify by going to **S3** → your bucket → **Permissions** → **Bucket policy** and confirming a policy like this exists:
-
-<details>
-<summary>Expected bucket policy (click to expand)</summary>
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Principal": {"Service": "cloudfront.amazonaws.com"},
-    "Action": "s3:GetObject",
-    "Resource": "arn:aws:s3:::video-testimonials-<your-account-id>/*",
-    "Condition": {
-      "StringEquals": {
-        "AWS:SourceArn": "arn:aws:cloudfront::<your-account-id>:distribution/<distribution-id>"
-      }
-    }
-  }]
-}
-```
-
-If the policy is missing, paste the above (with your values filled in) and click **Save changes**.
-
-</details>
-
-### 9. Set S3 CORS
-
-1. Go to **S3** → your bucket → **Permissions** → **Cross-origin resource sharing (CORS)** → **Edit**
-2. Paste:
-```json
-[{
-  "AllowedOrigins": ["*"],
-  "AllowedMethods": ["PUT", "GET"],
-  "AllowedHeaders": ["*"],
-  "MaxAgeSeconds": 3000
-}]
-```
-3. Click **Save changes**
 
 ### 10. Upload Frontend to S3
 
@@ -198,6 +214,10 @@ Before proceeding, verify the core app is working:
 4. Go to **S3** → your bucket → `testimonials/` folder and confirm the video and companion `.json` file are present
 
 If the upload succeeds, your app is fully working. Steps 11–12 below add email notifications on top of this.
+
+---
+
+### Phase 5 — Notifications
 
 ### 11. Create SNS Topic for Notifications
 
