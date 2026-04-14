@@ -52,7 +52,7 @@ video-testimonial/
 ### 1. Create S3 Bucket
 
 1. Go to **S3** → **Create bucket**
-2. Set bucket name: `aws-video-testimonials-<your-account-id>`
+2. Set bucket name: `testimonial-<your-account-id>`
 3. Region: `ap-south-1` (or your preferred region)
 4. Leave all **Block Public Access** settings ON (bucket stays private)
 5. Click **Create bucket**
@@ -89,7 +89,7 @@ CloudFront should have automatically updated the S3 bucket policy. Verify by goi
     "Effect": "Allow",
     "Principal": {"Service": "cloudfront.amazonaws.com"},
     "Action": "s3:GetObject",
-    "Resource": "arn:aws:s3:::aws-video-testimonials-<your-account-id>/*",
+    "Resource": "arn:aws:s3:::testimonial-<your-account-id>/*",
     "Condition": {
       "StringEquals": {
         "AWS:SourceArn": "arn:aws:cloudfront::<your-account-id>:distribution/<distribution-id>"
@@ -138,12 +138,12 @@ Create the role once with all required permissions — it will be shared by both
     {
       "Effect": "Allow",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::aws-video-testimonials-<your-account-id>/testimonials/*"
+      "Resource": "arn:aws:s3:::testimonial-<your-account-id>/testimonials/*"
     },
     {
       "Effect": "Allow",
       "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::aws-video-testimonials-<your-account-id>/testimonials/*"
+      "Resource": "arn:aws:s3:::testimonial-<your-account-id>/testimonials/*"
     },
     {
       "Effect": "Allow",
@@ -165,7 +165,7 @@ Create the role once with all required permissions — it will be shared by both
 6. Click **Deploy**
 7. Go to **Configuration** → **General configuration** → **Edit** → set **Timeout** to `0 min 30 sec` → **Save**
 8. Go to **Configuration** → **Environment variables** → **Edit** → Add:
-   - Key: `BUCKET_NAME`, Value: `aws-video-testimonials-<your-account-id>`
+   - Key: `BUCKET_NAME`, Value: `testimonial-<your-account-id>`
 9. Click **Save**
 
 ---
@@ -310,7 +310,7 @@ Your app is now accessible at `https://testimonial.yourdomain.com`
 ### 1. Create S3 Bucket
 
 ```bash
-BUCKET=aws-video-testimonials-<your-account-id>
+BUCKET=testimonial-<your-account-id>
 REGION=<your-region>
 
 aws s3api create-bucket \
