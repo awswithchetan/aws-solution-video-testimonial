@@ -188,6 +188,17 @@ Or via CLI:
 aws s3 cp frontend/index.html s3://<your-bucket>/index.html --content-type text/html
 ```
 
+### ✅ Validate Your Deployment
+
+Before proceeding, verify the core app is working:
+
+1. Open `https://<distribution-domain>.cloudfront.net` in your browser
+2. Enter your name and record or upload a short video
+3. Click **Submit Testimonial** — you should see the success message
+4. Go to **S3** → your bucket → `testimonials/` folder and confirm the video and companion `.json` file are present
+
+If the upload succeeds, your app is fully working. Steps 11–12 below add email notifications on top of this.
+
 ### 11. Create SNS Topic for Notifications
 
 1. Go to **SNS** → **Topics** → **Create topic** → **Standard**
