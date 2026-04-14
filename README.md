@@ -33,6 +33,17 @@ video-testimonial/
 
 ---
 
+## Prerequisites
+
+1. **AWS Account and IAM User** — An AWS account with an IAM user that has sufficient permissions to create S3, Lambda, API Gateway, CloudFront, SNS, and IAM resources
+2. **Local Workstation** — To clone this repository and edit `frontend/index.html`
+3. **AWS CLI** (optional, for CLI deployment or uploading frontend) — [Install and configure](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with `aws configure`
+4. **Public Hosted Zone in Route 53** (optional, only for custom domain) — A registered domain with Route 53 as the DNS provider
+
+> Need help with any of the above? Check out my [AWS YouTube playlist](https://www.youtube.com/playlist?list=PLIUhw5xEbE-WI2s0qoo3tKaiVlkz0pLIl).
+
+---
+
 ## Deploy via AWS Console (No CLI)
 
 ---
