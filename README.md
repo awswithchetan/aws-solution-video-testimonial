@@ -47,6 +47,12 @@ video-testimonial/
 
 ## Deployment Steps
 
+### Clone git repository in local workstation:
+```bash
+git clone https://github.com/awswithchetan/aws-solution-video-testimonial.git
+cd aws-solution-video-testimonial
+```
+
 ### Module 1 — Frontend Infrastructure
 
 ### 1. Create S3 Bucket
