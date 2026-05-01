@@ -1,5 +1,10 @@
 # Video Testimonial App
 
+This repo is a part of my youtube video where I have explained the architecture and detailed steps to deploy this application:
+
+Video: https://youtu.be/KUjDQNJBAks
+
+## Application
 A serverless web app to ask for video testimonial for your product or services. Testimonial video can be recorded using mobile phone or desktop and when submitted its uploaded to your private S3 bucket. 
 
 This is fully Serverless Application hosted on AWS using Amazon S3, CloudFront, API Gateway, Lambda and SNS.
